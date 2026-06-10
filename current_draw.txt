@@ -1,0 +1,6 @@
+# ProductRange,LowerLimit_mA,UpperLimit_mA
+RT,2.0,8.0
+XJ,2.0,6.5
+XV,2.0,7.75
+XF,2.0,7.5
+FT,2.0,5.2

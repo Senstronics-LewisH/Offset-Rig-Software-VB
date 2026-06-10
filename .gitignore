@@ -1,0 +1,20 @@
+# twinBASIC / VB6 gitignore
+
+# Compiled outputs
+*.exe
+*.dll
+*.ocx
+
+# Workspace and temporary settings
+*.vbw
+*.tmp
+*.log
+Thumbs.db
+desktop.ini
+
+# Automated tool backups
+*.bak
+
+# twinBASIC build/output artifacts
+/Build/
+/.twin/
