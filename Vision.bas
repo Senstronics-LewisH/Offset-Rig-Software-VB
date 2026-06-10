@@ -1,4 +1,6 @@
 Attribute VB_Name = "Vision"
+Option Explicit
+
 Public Sub SendvisionCommand(ByVal Command As String)
     
       MainForm.VisionComm.Output = Command & vbCr
@@ -22,6 +24,7 @@ Public Sub RecieveVision()
     Dim T1Reply As String
     Dim T2Reply As String
     Dim T3Reply As String
+    Dim T4Reply As String
 
 'T101 = oring present if 0 not present if 1
 'T100 = restrictor present if 0 not present if 1

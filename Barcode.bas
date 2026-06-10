@@ -1,4 +1,5 @@
 Attribute VB_Name = "Barcode"
+Option Explicit
 
 Public Function SECONDMCSBARCODE()
 

@@ -1,4 +1,6 @@
 Attribute VB_Name = "ieeeevb"
+Option Explicit
+
 '****************************************************************************************************
 'Module1  (ieeevb.bas)          Visual Basic 6.0 Module
 'Last modified: never modified
@@ -173,6 +175,8 @@ End Sub
 '               yy = l
 Sub tarray(d As Variant, ByVal Count As Long, ByVal eoi As Integer, Status As Integer)
     Dim dd(32767) As Integer
+    Dim xx As Long
+    Dim yy As Long
 #If Win32 Then
     Dim stl As Long
     If (Count And 1) = 0 Then yy = Count / 2 Else yy = Count / 2 + 1
@@ -196,6 +200,8 @@ End Sub
 '
 Sub rarray(d As Variant, ByVal Count As Long, l As Integer, Status As Integer)
     Dim dd(32767) As Integer
+    Dim xx As Long
+    Dim yy As Long
 #If Win32 Then
     Dim stl As Long
     Dim ll As Long

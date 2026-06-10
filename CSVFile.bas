@@ -1,9 +1,12 @@
 Attribute VB_Name = "CSVFile"
+Option Explicit
+
 Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal hwnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
 
 Public Function FindExcelFile() As Boolean
 
 Dim FilePath As String
+Dim FileName As String
 
 
 FilePath = "\\USVR8\Results\Production\Offset Check Results\"
@@ -21,6 +24,9 @@ End Function
 Public Function FindPODInExcelFile() As Boolean
 
 Dim FilePath As String
+Dim FileName As String
+Dim objExcel As Object
+Dim objWorkbook As Object
 
 On Error GoTo errhandler
 
@@ -52,6 +58,13 @@ End Function
 Public Function FindResults()
 
 Dim FilePath As String
+Dim FileName As String
+Dim objExcel As Object
+Dim objWorkbook As Object
+Dim TotalGood As Long
+Dim TotalBad As Long
+Dim TotalParts As Long
+Dim PercentFail As String
 
 On Error GoTo errhandler
 
@@ -98,6 +111,12 @@ End Function
 Public Sub CreateExcel()
 
 Dim NewFile As New Excel.Application
+Dim FilePath As String
+Dim FileName As String
+Dim xl As Object
+Dim xlwbook As Object
+Dim xlsheet As Object
+Dim i As Long
 
 FilePath = "\\USVR8\Results\Production\Offset Check Results\"
     
@@ -165,6 +184,15 @@ End Sub
 Public Function Update25DayHoldResult() As Boolean
 
 Dim FilePath As String
+Dim FileName As String
+Dim xl As Object
+Dim xlwbook As Object
+Dim xlsheet As Object
+Dim Transducer As Long
+Dim Row As Long
+Dim InitialResult As Variant
+Dim OffDif As Double
+Dim Vout1OriginalOutputDisplay As Variant
 Dim i As Integer
 
 On Error GoTo errhandler
@@ -222,6 +250,21 @@ End Function
 Public Sub UpdateExcelWithIdResults()
 
 Dim FilePath As String
+Dim FileName As String
+Dim xl As Object
+Dim xlwbook As Object
+Dim xlsheet As Object
+Dim Transducer As Long
+Dim Row As Long
+Dim QrValue As String
+Dim Response As Long
+Dim InitialResult As Variant
+Dim TotalGood As Long
+Dim TotalBad As Long
+Dim TotalParts As Long
+Dim PercentFail As String
+Dim OldReading As Variant
+Dim Column As Long
 Dim i As Integer
 
 On Error GoTo errhandler
@@ -248,7 +291,6 @@ AddToHistoryLogCDrive "Input Data"
     If MainForm.PartNumber = "%PTT14043" Or MainForm.PartNumber = "%PTT14044" Then
         If MainForm.PartCount <= 3 Then
             MainForm.PartCount = MainForm.PartCount + 1
-            Dim QrValue
             QrValue = ""
             While QrValue = ""
                 'Open the scan form
@@ -377,6 +419,7 @@ End Sub
 Public Function OpenExcelFile()
 
     Dim FilePath As String
+    Dim FileName As String
 
     FilePath = "\\USVR8\Results\Production\Offset Check Results\"
        
@@ -422,6 +465,8 @@ Public Sub PrintLabel()
     Dim FileLine As String
     Dim FileHandle As Integer
     Dim WorkOrder As String
+    Dim IDNumber As Long
+    Dim FileName As String
     
     On Error GoTo errhandler
    
