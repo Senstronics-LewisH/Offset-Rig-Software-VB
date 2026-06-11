@@ -108,13 +108,14 @@ def sync_project(project_dir, fix_references_level=0):
         print(f"ERROR: twinproj file not found at {twinproj_path}")
         return False
         
-    if os.path.exists(backup_path):
-        source_path = backup_path
-    else:
-        source_path = twinproj_path
+    # Create a fresh backup of the current twinproj file before writing
+    try:
         with open(twinproj_path, "rb") as sf, open(backup_path, "wb") as df:
             df.write(sf.read())
+    except Exception as e:
+        print(f"Warning: Could not create backup: {e}")
             
+    source_path = twinproj_path
     with open(source_path, "rb") as f:
         orig_data = f.read()
         
