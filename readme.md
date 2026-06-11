@@ -24,15 +24,24 @@ The core goal of this project is two-fold:
 ## 🚀 Key Modernizations Achieved
 
 *   **🎛️ Codebase Unification:** Consolidated three distinct, station-specific project directories into one repository. Station-specific hardware identifiers (VISA IDs), calibration constants, and timing delays have been abstracted into a single local config file: `offset_config.txt`.
-*   **🔌 Dynamic Current Draw Overrides:** Replaced duplicated hardcoded current limits with dynamic limits loaded from `current_draw.txt` on a per-product-range basis (e.g. `RT`, `XJ`, `XV`, `FT`, `XF`).
-*   **🔋 AM Product Range Exceptions:** Added exception rules (including custom voltage thresholds and limits of ±12) for the new `"AM"` product line, mapping them dynamically to the existing `"UB"` product rules.
-*   **📂 Dynamic File Parsing:** Replaced the legacy fixed-length loops (e.g. `For i = 1 To 150`) with modern `Do While Not EOF(FileHandle)` structures to allow configuration lists to grow dynamically without compilation limits.
+*   **🔌 Dynamic Current Draw Overrides:** Replaced duplicated hardcoded current limits with dynamic limits loaded from `current_draw.txt` on a per-product-range basis.
+*   **🔋 AM Product Range Exceptions:** Added exception rules for the new `"AM"` product line, mapping them dynamically to the existing `"UB"` product rules.
+*   **📂 Dynamic File Parsing:** Replaced the legacy fixed-length loops with modern `Do While Not EOF(FileHandle)` structures.
+*   **Option Explicit Directives:** Enforced strict variable declaration compilation checks across all key modules, resolving dozens of implicit type compiler warnings.
+*   **Line of Best Fit Resistor Conversion:** Replaced the 1,000+ line hardcoded resistor mapping table with a single Line of Best Fit equation ($R^2 = 99.998\%$) in `CheckLoad()`.
+*   **🎚️ Consolidated DMM Switching:** Consolidated over 80 repetitive switching card functions in `DigitalMultimeterControl.bas` and removed massive duplicate `If PinOutSwitch = ...` blocks in `OffsetCheck.bas`, routing all relays through a single parameterized `RouteDMM` function.
+*   **🔒 Safe Excel COM Lifecycle:** Overhauled the Excel reporting parser to cleanly close workbooks and release reference counts in order, eliminating `excel.exe` process leaks.
+*   **🌍 Configuration-Driven Paths:** Abstracted all local and network file paths into configuration parameters loaded from `offset_config.txt` with zero-config backward-compatible defaults.
 
 ---
 
 ## 🗺️ Roadmap & Backlog (Identified by Human Auditors)
 
 We have identified several critical areas for improvement to be resolved in upcoming sprints:
+
+> [!NOTE]
+> **Database Consolidation Intent:**
+> In the future, we intend to consolidate the multiple separate text files currently used to store long-term rig databases (such as `Board Type.txt`, `union list.txt`, `connector type.txt`, `Colour list.txt`, and `cable list.txt`) into a single structured configuration or a shared SQLite database. Since these parameters are identical across all three physical Offset calibration stations, moving to a unified configuration source will simplify change management and ensure absolute data alignment across rigs.
 
 ### 🏷️ A. Version Control & Release Management
 *   **The Issue:** Right now, versioning is arbitrary (indicated only by `"V34"` in the main form title and `"V34.1"` in the binary's filename).

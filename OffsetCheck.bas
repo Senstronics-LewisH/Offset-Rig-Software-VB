@@ -1678,7 +1678,7 @@ End If
 
 If SensorStatus(MainForm.SensorID) <> PASSED Then
       
-    sSoundName = "C:\offset setup files\failed.wav"
+    sSoundName = SoundFailedPath
     PlaySound sSoundName, CLng(0), 1
     MainForm.PASSED.Visible = False
     MainForm.FAILED.Visible = True
@@ -1748,7 +1748,7 @@ If PackOnly = False Then
     
  AddToHistoryLogCDrive "update cable usage"
     
-    WriteCableUsageFile ("C:\offset setup files\Cable Usage.txt")
+    WriteCableUsageFile (CableUsagePath)
     
  AddToHistoryLogCDrive "update cable usage complete"
     
@@ -1765,7 +1765,7 @@ End If
     LogEntry = "TestTime = " & TestTime & "  RecordTime = " & RecordTime
     AddToHistoryLog LogEntry
     
-    sSoundName = "C:\offset setup files\complete.wav"
+    sSoundName = SoundCompletePath
     PlaySound sSoundName, CLng(0), 1
 
 'MainForm.TimeDisplay = Format$(TestTime, "s")

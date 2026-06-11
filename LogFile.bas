@@ -4,6 +4,21 @@ Public PSU_Visa_ID As String
 Public Temp_Cal_Offset As Double
 Public Relay_Delay As Long
 
+Public BoardTypePath As String
+Public UnionListPath As String
+Public ConnectorTypePath As String
+Public ColourListPath As String
+Public CableListPath As String
+Public CableUsagePath As String
+Public RigTypePath As String
+Public ResultsPath As String
+Public LocalResultsPath As String
+Public WorkOrderPath As String
+Public LabelPrintInputPath As String
+Public LabelPrintBatchPath As String
+Public SoundCompletePath As String
+Public SoundFailedPath As String
+
 
 Public Type CurrentDrawOverride
     ProductRange As String
@@ -81,7 +96,7 @@ Public Function CreateCsfDirectoryStructureCDrive(ByVal CalibrationStartTime As 
     
     On Error Resume Next
  
-    PathName = "C:\My documents\Offset Check Results\"
+    PathName = LocalResultsPath
     MkDir PathName
    
     PathName = PathName & "\" & Format$(CalibrationStartTime, "yyyy")
@@ -127,7 +142,7 @@ Public Function CreateCsfDirectoryStructure(ByVal CalibrationStartTime As Date) 
     
     On Error Resume Next
  
-    PathName = "\\USVR8\Results\Production\Offset Check Results\Switch Offset"
+    PathName = ResultsPath & "Switch Offset"
     MkDir PathName
    
     PathName = PathName & "\" & Format$(CalibrationStartTime, "yyyy")
@@ -157,7 +172,7 @@ Public Function ReadBoardTypeList()
     Dim FileName As String
         
     On Error GoTo errhandler
-    FileName = "C:\offset setup files\Board Type.txt"
+    FileName = BoardTypePath
     FileHandle = FreeFile
     
     Open FileName For Input As #FileHandle
@@ -199,7 +214,7 @@ Public Function ReadRetrieveUnionList()
     Dim FileName As String
         
     On Error GoTo errhandler
-    FileName = "C:\offset setup files\union list.txt"
+    FileName = UnionListPath
     FileHandle = FreeFile
     
     Open FileName For Input As #FileHandle
@@ -239,7 +254,7 @@ Public Function ReadConnectorTypeList()
     Dim FileName As String
         
     On Error GoTo errhandler
-    FileName = "C:\offset setup files\connector type.txt"
+    FileName = ConnectorTypePath
     FileHandle = FreeFile
     
     Open FileName For Input As #FileHandle
@@ -281,7 +296,7 @@ Public Function ReadRetrieveColourList()
     Dim FileName As String
         
     On Error GoTo errhandler
-    FileName = "C:\offset setup files\Colour list.txt"
+    FileName = ColourListPath
     FileHandle = FreeFile
     
     Open FileName For Input As #FileHandle
@@ -321,7 +336,7 @@ Public Function ReadRetrieveCableList()
     Dim FileName As String
         
     On Error GoTo errhandler
-    FileName = "C:\offset setup files\cable list.txt"
+    FileName = CableListPath
     FileHandle = FreeFile
     
     Open FileName For Input As #FileHandle
@@ -363,7 +378,7 @@ Public Function ReadRetrieveCableUsage()
     Dim FileName As String
         
     On Error GoTo errhandler
-    FileName = "C:\offset setup files\Cable Usage.txt"
+    FileName = CableUsagePath
     FileHandle = FreeFile
     
     Open FileName For Input As #FileHandle
@@ -405,7 +420,7 @@ Public Function FindRigType()
     Dim FileName As String
         
     On Error GoTo errhandler
-    FileName = "C:\offset setup files\Rig Type.txt"
+    FileName = RigTypePath
     FileHandle = FreeFile
     
     
@@ -445,7 +460,7 @@ Public Sub FindWorkOrder()
 
   If MainForm.ScanAllCheck = 0 Then
         WorkOrderFound = False
-        ReadLiveWorksOrderFile ("M:\paulseal.txt")
+        ReadLiveWorksOrderFile (WorkOrderPath)
     Else
         WorkOrderFound = True
     End If
@@ -590,6 +605,21 @@ Public Sub LoadOffsetConfig()
     PSU_Visa_ID = "9103875"
     Temp_Cal_Offset = -5#
     Relay_Delay = 0
+    
+    BoardTypePath = "C:\offset setup files\Board Type.txt"
+    UnionListPath = "C:\offset setup files\union list.txt"
+    ConnectorTypePath = "C:\offset setup files\connector type.txt"
+    ColourListPath = "C:\offset setup files\Colour list.txt"
+    CableListPath = "C:\offset setup files\cable list.txt"
+    CableUsagePath = "C:\offset setup files\Cable Usage.txt"
+    RigTypePath = "C:\offset setup files\Rig Type.txt"
+    ResultsPath = "\\USVR8\Results\Production\Offset Check Results\"
+    LocalResultsPath = "C:\My documents\Offset Check Results\"
+    WorkOrderPath = "M:\paulseal.txt"
+    LabelPrintInputPath = "M:\system\load\Vborders.txt"
+    LabelPrintBatchPath = "C:\liveorders\PrintLabel.bat"
+    SoundCompletePath = "C:\offset setup files\complete.wav"
+    SoundFailedPath = "C:\offset setup files\failed.wav"
 
     FileName = App.Path & "\offset_config.txt"
 
@@ -626,6 +656,34 @@ Public Sub LoadOffsetConfig()
                     Temp_Cal_Offset = Val(value)
                 ElseIf key = "relay_delay" Then
                     Relay_Delay = Val(value)
+                ElseIf key = "board_type_path" Then
+                    BoardTypePath = value
+                ElseIf key = "union_list_path" Then
+                    UnionListPath = value
+                ElseIf key = "connector_type_path" Then
+                    ConnectorTypePath = value
+                ElseIf key = "colour_list_path" Then
+                    ColourListPath = value
+                ElseIf key = "cable_list_path" Then
+                    CableListPath = value
+                ElseIf key = "cable_usage_path" Then
+                    CableUsagePath = value
+                ElseIf key = "rig_type_path" Then
+                    RigTypePath = value
+                ElseIf key = "results_path" Then
+                    ResultsPath = value
+                ElseIf key = "local_results_path" Then
+                    LocalResultsPath = value
+                ElseIf key = "work_order_path" Then
+                    WorkOrderPath = value
+                ElseIf key = "label_print_input_path" Then
+                    LabelPrintInputPath = value
+                ElseIf key = "label_print_batch_path" Then
+                    LabelPrintBatchPath = value
+                ElseIf key = "sound_complete_path" Then
+                    SoundCompletePath = value
+                ElseIf key = "sound_failed_path" Then
+                    SoundFailedPath = value
                 End If
             End If
         End If

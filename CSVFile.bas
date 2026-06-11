@@ -7,7 +7,7 @@ Public Function FindExcelFile() As Boolean
     Dim FilePath As String
     Dim FileName As String
 
-    FilePath = "\\USVR8\Results\Production\Offset Check Results\"
+    FilePath = ResultsPath
     FileName = FilePath & WorksOrder & ".xls"
         
     If Len(Dir(FileName)) > 0 Then
@@ -30,7 +30,7 @@ Public Function FindPODInExcelFile() As Boolean
     
     On Error GoTo errhandler
     
-    FilePath = "\\USVR8\Results\Production\Offset Check Results\"
+    FilePath = ResultsPath
     FileName = FilePath & WorksOrder & ".xls"
     
     Set xlApp = New Excel.Application
@@ -85,7 +85,7 @@ Public Function FindResults()
     
     On Error GoTo errhandler
     
-    FilePath = "\\USVR8\Results\Production\Offset Check Results\"
+    FilePath = ResultsPath
     FileName = FilePath & WorksOrder & ".xls"
     
     Set xlApp = New Excel.Application
@@ -149,7 +149,7 @@ Public Sub CreateExcel()
     
     On Error GoTo errhandler
     
-    FilePath = "\\USVR8\Results\Production\Offset Check Results\"
+    FilePath = ResultsPath
     FileName = FilePath & WorksOrder & ".xls"
     
     Set xlApp = New Excel.Application
@@ -249,7 +249,7 @@ Public Function Update25DayHoldResult() As Boolean
     
     On Error GoTo errhandler
     
-    FilePath = "\\USVR8\Results\Production\Offset Check Results\"
+    FilePath = ResultsPath
     FileName = FilePath & WorksOrder & ".xls"
     
     Set xlApp = New Excel.Application
@@ -335,7 +335,7 @@ Public Sub UpdateExcelWithIdResults()
     
     On Error GoTo errhandler
     
-    FilePath = "\\USVR8\Results\Production\Offset Check Results\"
+    FilePath = ResultsPath
     AddToHistoryLogCDrive "Open Excel"
     FileName = FilePath & WorksOrder & ".xls"
     
@@ -477,7 +477,7 @@ Public Function OpenExcelFile()
     Dim FilePath As String
     Dim FileName As String
 
-    FilePath = "\\USVR8\Results\Production\Offset Check Results\"
+    FilePath = ResultsPath
     FileName = FilePath & WorksOrder & ".xls"
 
     ShellExecute 0, vbNullString, FileName, vbNullString, vbNullString, vbNormalFocus
@@ -512,7 +512,7 @@ Public Sub PrintLabel()
    
     WorkOrder = (Mid$(MainForm.WorksOrderBarcode, 5, 15))
     IDNumber = MainForm.SensorID
-    FileName = "M:\system\load\Vborders.txt"
+    FileName = LabelPrintInputPath
     
     FileHandle = FreeFile
     Open FileName For Output As #FileHandle
@@ -521,7 +521,7 @@ Public Sub PrintLabel()
     Print #FileHandle, FileLine
     Close #FileHandle
 
-    Shell ("C:\liveorders\PrintLabel.bat")
+    Shell (LabelPrintBatchPath)
     Exit Sub
     
 errhandler:
