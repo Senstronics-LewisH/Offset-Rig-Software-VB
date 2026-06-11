@@ -164,6 +164,35 @@ def main():
         print("Please compile the project to the correct folder and rerun this script.")
         sys.exit(1)
         
+    # Verify the version in the compiled binary to ensure the IDE was reloaded
+    print("Verifying version string in compiled executable...")
+    version_utf16 = new_version.encode("utf-16-le")
+    
+    while True:
+        with open(LOCAL_EXE, "rb") as f:
+            exe_data = f.read()
+            
+        if version_utf16 in exe_data:
+            print(f"SUCCESS: Verified version '{new_version}' is compiled into the executable.")
+            break
+        else:
+            print("\n" + "!" * 80)
+            print(f"ERROR: The compiled executable does not contain the version string '{new_version}'!")
+            print("This usually happens because the twinBASIC IDE was already open and compiled the old version from memory.")
+            print("To fix this:")
+            print("  1. Close the twinBASIC IDE (or close the active project/workspace).")
+            print("  2. Open the project again in twinBASIC (so it loads the updated 'Project1.twinproj' from disk).")
+            print("  3. Build the project again (compile to 'OffsetCheck.exe').")
+            print("!" * 80)
+            
+            retry = input("\nHave you recompiled the project? Press Enter to retry verification (or type 'q' to quit): ").strip().lower()
+            if retry == 'q':
+                sys.exit(0)
+                
+            if not os.path.exists(LOCAL_EXE):
+                print(f"ERROR: Compiled executable '{LOCAL_EXE}' could not be found.")
+                continue
+
     # 7. Commit changes, tag, and push
     print("\nCommitting changes and creating Git tag...")
     run_git(["add", "."])
