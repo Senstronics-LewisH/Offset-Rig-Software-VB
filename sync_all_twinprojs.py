@@ -190,6 +190,12 @@ def sync_project(project_dir, fix_references_level=0):
             node.data_or_children = twin_data
             node.val = len(twin_data)
             print("  Updated MainForm.frm.twin")
+        elif node.name == "MainForm.frm.tbform":
+            tbform_data = node.data_or_children
+            tbform_data = tbform_data.replace(b'"Caption": "POST CALIBRATION OFFSET CHECKER V34"', b'"Caption": "POST CALIBRATION OFFSET CHECKER"')
+            node.data_or_children = tbform_data
+            node.val = len(tbform_data)
+            print("  Updated MainForm.frm.tbform (removed V34 default)")
         elif node.name == "CableUsage.frm.twin":
             twin_data = make_frm_twin_content(node.data_or_children, cableusagefrm_path)
             node.data_or_children = twin_data

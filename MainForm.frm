@@ -1896,7 +1896,7 @@ Begin VB.Form MainForm
    Begin VB.Label TitleLabel 
       Alignment       =   2  'Center
       BackStyle       =   0  'Transparent
-      Caption         =   "POST CALIBRATION OFFSET CHECKER V34"
+      Caption         =   "POST CALIBRATION OFFSET CHECKER"
       BeginProperty Font 
          Name            =   "Arial Black"
          Size            =   21.75
@@ -2245,6 +2245,10 @@ Dim id As Double
 End Sub
 Private Sub Form_Load()
     LoadOffsetConfig
+    
+    ' Programmatically set the version caption immediately so it's correct during initialization/MsgBoxes
+    TitleLabel.Caption = "POST CALIBRATION OFFSET CHECKER " & CompileVersion
+    Me.Caption = TitleLabel.Caption
         
     InitialisePSU
     InitialiseVision
@@ -2268,6 +2272,7 @@ If OffsetType = 1 Then
     Post25DayTest = False
     Retests = False
     TitleLabel.Caption = "POST CALIBRATION OFFSET CHECKER " & CompileVersion
+    Me.Caption = TitleLabel.Caption
     Vout1OriginalOutputLabel.Visible = False
     Vout1OriginalOutputDisplay.Visible = False
     VoutDiffLabel.Visible = False
@@ -2283,6 +2288,7 @@ ElseIf OffsetType = 2 Then
     Retests = False
     MainForm.BackColor = &H80C0FF
     TitleLabel.Caption = "POST 25 Day HOLD CHECK " & CompileVersion
+    Me.Caption = TitleLabel.Caption
     Vout1OriginalOutputLabel.Visible = True
     Vout1OriginalOutputDisplay.Visible = True
     VoutDiffLabel.Visible = True
@@ -2298,6 +2304,7 @@ ElseIf OffsetType = 3 Then
     Retests = False
     MainForm.BackColor = &H8080FF
     TitleLabel.Caption = "0.4% RETEST SCRAP OFFSET CHECKER " & CompileVersion
+    Me.Caption = TitleLabel.Caption
     Vout1OriginalOutputLabel.Visible = False
     Vout1OriginalOutputDisplay.Visible = False
     VoutDiffLabel.Visible = False

@@ -226,7 +226,7 @@ Public Function ReadBoardTypeList()
     Exit Function
     
 errhandler:
-    MsgBox "Error opening Board Type list" & FileName & " Contact Engineering"
+    If Not DevMode Then MsgBox "Error opening Board Type list" & FileName & " Contact Engineering"
     ReadBoardTypeList = False
 
 End Function
@@ -266,7 +266,7 @@ Public Function ReadRetrieveUnionList()
     Exit Function
     
 errhandler:
-    MsgBox "Error opening union list" & FileName & " Contact Engineering"
+    If Not DevMode Then MsgBox "Error opening union list" & FileName & " Contact Engineering"
     ReadRetrieveUnionList = False
 
 End Function
@@ -308,7 +308,7 @@ Public Function ReadConnectorTypeList()
     Exit Function
     
 errhandler:
-    MsgBox "Error opening connector code" & FileName & " Contact Engineering"
+    If Not DevMode Then MsgBox "Error opening connector code" & FileName & " Contact Engineering"
     ReadConnectorTypeList = False
 
 End Function
@@ -348,7 +348,7 @@ Public Function ReadRetrieveColourList()
     Exit Function
     
 errhandler:
-    MsgBox "Error opening O-ring Colour list" & FileName & " Contact Engineering"
+    If Not DevMode Then MsgBox "Error opening O-ring Colour list" & FileName & " Contact Engineering"
     ReadRetrieveColourList = False
 
 End Function
@@ -390,7 +390,7 @@ Public Function ReadRetrieveCableList()
     Exit Function
     
 errhandler:
-    MsgBox "Error opening Cable list" & FileName & " Contact Engineering"
+    If Not DevMode Then MsgBox "Error opening Cable list" & FileName & " Contact Engineering"
     ReadRetrieveCableList = False
 
 End Function
@@ -432,11 +432,16 @@ Public Function ReadRetrieveCableUsage()
     Exit Function
     
 errhandler:
-    MsgBox "Error opening Cable list" & FileName & " Contact Engineering"
+    If Not DevMode Then MsgBox "Error opening Cable list" & FileName & " Contact Engineering"
     ReadRetrieveCableUsage = False
 
 End Function
 Public Function FindRigType()
+    If DevMode Then
+        OffsetType = 1
+        FindRigType = True
+        Exit Function
+    End If
     
     Dim FileHandle As Integer
     Dim FileName As String
@@ -444,8 +449,6 @@ Public Function FindRigType()
     On Error GoTo errhandler
     FileName = RigTypePath
     FileHandle = FreeFile
-    
-    
     
     Open FileName For Input As #FileHandle
 
