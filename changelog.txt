@@ -1,3 +1,9 @@
+Version v1.0.38 - 2026-06-11 12:12
+========================================
+* Updated the position of the heading caption. (5da1973)
+* Make LaunchOffsetCheck.ps1 auto-recover if local executable is empty or corrupt (0daea6e)
+* Add programatic version verification to release script and create redeploy.py utility (866989e)
+
 Version v1.0.37 - 2026-06-11 11:53
 ========================================
 * Fix form version title caption displaying stale V34, sync window title bar, and clean design-time defaults (a61f91f)

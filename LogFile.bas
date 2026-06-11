@@ -7,7 +7,7 @@ Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 #End If
 
-Public Const CompileVersion As String = "v1.0.37"
+Public Const CompileVersion As String = "v1.0.38"
 Public UpdateNetworkPath As String
 Public DevMode As Boolean
 
