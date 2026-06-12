@@ -85,7 +85,7 @@ Public Sub RecieveVision()
 'T100 = restrictor present if 0 not present if 1
 
     If T2Reply = "0" Then
-        If RestrictorRequired = True Then
+        If RestrictorReq = True Then
             MainForm.RestrictorPass.Visible = True
             RestrictorResult = True
         Else
@@ -94,7 +94,7 @@ Public Sub RecieveVision()
             RestrictorResult = False
         End If
     Else
-        If RestrictorRequired = True Then
+        If RestrictorReq = True Then
             MainForm.RestrictorFail.Visible = True
             SensorStatus(MainForm.SensorID) = FailedRestPresent
             RestrictorResult = False
@@ -108,7 +108,7 @@ Public Sub RecieveVision()
 
 
     If T3Reply = "0" Then
-        If RestrictorRequired = True Then
+        If RestrictorReq = True Then
             MainForm.RestrictorWeldedPass.Visible = True
             RestrictorWelded = True
         Else
@@ -117,7 +117,7 @@ Public Sub RecieveVision()
             RestrictorWelded = False
         End If
     Else
-        If RestrictorRequired = True Then
+        If RestrictorReq = True Then
             MainForm.RestrictorWeldedFail.Visible = True
             SensorStatus(MainForm.SensorID) = FailedRestweld
             RestrictorWelded = False

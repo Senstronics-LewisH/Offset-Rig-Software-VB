@@ -17,6 +17,7 @@ Module=InputsOutputs; InputsOutputs.bas
 Module=OffsetCheck; OffsetCheck.bas
 Module=CSVFile; CSVFile.bas
 Module=Vision; Vision.bas
+Module=Barcode; Barcode.bas
 Form=PWord.frm
 Form=CableUsage.frm
 IconForm="MainForm"

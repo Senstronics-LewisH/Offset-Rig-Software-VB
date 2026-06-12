@@ -56,7 +56,7 @@ Public CSVLineRequest As Double
 Public OffsetErrorPercent As Double
 Public OringMCS As String
 Public ORingRequired As Boolean
-Public RestrictorRequired As Boolean
+Public RestrictorReq As Boolean
 Public MCSUnionType As String
 Public MCSORingType As String
 Public VisionProgram As String
@@ -88,6 +88,11 @@ Public STCV2Result As Boolean
 Public PinOutSwitch As String
 Public ScannedCableCode As String
 Public IOCard As Boolean
+Public MCSProductRange As String
+Public MCSMatingConnector As String
+Public MCSEndDelimiter As String
+Public ThirdBarcodeFormatCheck As String
+Public Vout2Mode As String
 Public Vout1Error As Double
 Public TotalBad As Double
 Public TotalGood As Double
@@ -238,8 +243,11 @@ Dim MyValue As String
     LoadOffsetConfig
 
     LoadCurrentDrawOverrides
-    RestrictorRequired = False
-   
+    
+    ' Parse the first and third barcodes programmatically
+    ParseFirstBarcode MainForm.FirstMCSBarcode
+    ParseThirdBarcode MainForm.ThirdMCSBarcode
+    
     If Mid$(WorksOrder, 1, 2) = "UB" Or Mid$(WorksOrder, 1, 2) = "AM" Or Mid$(WorksOrder, 1, 2) = "ST" Or Mid$(WorksOrder, 1, 2) = "UC" Or Mid$(WorksOrder, 1, 2) = "Z0" Then
         PackOnly = True
     Else
@@ -265,31 +273,17 @@ Dim MyValue As String
         MainForm.InsulationDisplay.Visible = True
         MainForm.InsulationLabel.Visible = True
           
-        RestrictorRequired = False
+        RestrictorReq = False
             
         MainForm.ConnectorTypeDisplay = "Pack"
         BoardType = "None"
     
-        If (Mid$(MainForm.FirstMCSBarcode, 14, 1) = "/") Then
-                
-            If (Mid$(MainForm.FirstMCSBarcode, 15, 2) = "") Or (Mid$(MainForm.FirstMCSBarcode, 15, 1) = "-") Or (Mid$(MainForm.FirstMCSBarcode, 15, 2) = "--") Or (Mid$(MainForm.FirstMCSBarcode, 29, 2) = "TT") Then
-                MainForm.ORingDisplay = "No"     ' Added 15,1 "-" to above line - Lee 24/04/20
-                ORingRequired = False
-            Else
-                MainForm.ORingDisplay = "Yes"
-                ORingRequired = True
-            End If
+        If ORingRequired Then
+            MainForm.ORingDisplay = "Yes"
         Else
-            If (Mid$(MainForm.FirstMCSBarcode, 18, 2) = "") Or (Mid$(MainForm.FirstMCSBarcode, 18, 2) = "--") Then
-                MainForm.ORingDisplay = "No"
-                ORingRequired = False
-            Else
-                MainForm.ORingDisplay = "Yes"
-                ORingRequired = True
-            End If
+            MainForm.ORingDisplay = "No"
         End If
         
-        MCSUnionType = Mid$(MainForm.FirstMCSBarcode, 10, 3)
         MainForm.UnionCodeDisplay = MCSUnionType
         
         i = 1
@@ -314,18 +308,12 @@ Dim MyValue As String
         
         If Mid$(WorksOrder, 1, 2) = "UC" Then
          
-            If (Mid$(MainForm.FirstMCSBarcode, 13, 1) = "0") Then
-                MainForm.RestrictorDisplay = "No"
-                RestrictorRequired = False
-            Else
+            If RestrictorReq Then
                 MainForm.RestrictorDisplay = "Yes"
-                RestrictorRequired = True
+            Else
+                MainForm.RestrictorDisplay = "No"
             End If
              
-        CableType = (Mid$(MainForm.FirstMCSBarcode, 15, 5))
-        CableType1 = (Mid$(MainForm.FirstMCSBarcode, 15, 6))    ' Added Lee Scott 16/03/20
-        If CableType1 = "AT2XTV" Then CableType = "AT2YT"       ' Added Lee
-                  
         i = 1
                 
         For i = 1 To NumberOfCables + 1
@@ -361,8 +349,6 @@ Dim MyValue As String
                 End If
             Next
         
-            ConnectorType = (Mid$(MainForm.FirstMCSBarcode, 18, 2))
-            
             i = 1
            
             For i = 1 To NumberOfConnectors + 1
@@ -394,12 +380,9 @@ Dim MyValue As String
                 End If
             Next
             
-          BoardType = (Mid$(MainForm.FirstMCSBarcode, 15, 2))
-        
-            If (Mid$(MainForm.FirstMCSBarcode, 20, 1)) = "M" Or (Mid$(MainForm.FirstMCSBarcode, 20, 1)) = "H" Then
+            If MCSMatingConnector = "M" Or MCSMatingConnector = "H" Then
                 MsgBox " PLEASE STAMP FIT MATING CONNECTOR ON FRONT OF WORKS ORDER"
             End If
-            
             
             i = 1
             
@@ -432,10 +415,6 @@ Dim MyValue As String
     
     If PackOnly = False Then
            
-        CableType = (Mid$(MainForm.FirstMCSBarcode, 15, 5))
-        CableType1 = (Mid$(MainForm.FirstMCSBarcode, 15, 6))    ' Added Lee Scott 16/03/20
-        If CableType1 = "AT2XTV" Then CableType = "AT2YT"       ' Added Lee
-                  
         i = 1
                 
         For i = 1 To NumberOfCables + 1
@@ -482,7 +461,6 @@ Dim MyValue As String
             End If
         Next
             
-        MCSUnionType = Mid$(MainForm.FirstMCSBarcode, 10, 3)
         MainForm.UnionCodeDisplay = MCSUnionType
         
         i = 1
@@ -505,8 +483,6 @@ Dim MyValue As String
         MainForm.ProgramDisplay = VisionProgram
         ChangeVisionProgram VisionProgram
                   
-        ConnectorType = (Mid$(MainForm.FirstMCSBarcode, 18, 2))
-        
         i = 1
        
         For i = 1 To NumberOfConnectors + 1
@@ -539,7 +515,7 @@ Dim MyValue As String
         
         Next
     
-        If (Mid$(MainForm.ThirdMCSBarcode, 3, 1) = "T") Or (Mid$(MainForm.ThirdMCSBarcode, 3, 1) = "S") Then
+        If Vout2 Then
             Vout2STC = False
             MainForm.STCOUTPUTLabel.Visible = False
             MainForm.STCTargetDisplay.Visible = False
@@ -554,7 +530,7 @@ Dim MyValue As String
              
         If ConnectorType = "XJ" Or ConnectorType = "XR" Then
         
-            If Mid$(MainForm.FirstMCSBarcode, 10, 3) = "S05" Then
+            If MCSUnionType = "S05" Then
                 Vout2STC = False ' common rail
                 MainForm.STCOUTPUTLabel.Visible = False
                 MainForm.STCTargetDisplay.Visible = False
@@ -564,7 +540,7 @@ Dim MyValue As String
         End If
         
         If ConnectorType = "XU" Then
-           If (Mid$(MainForm.FirstMCSBarcode, 15, 2)) = "DT" Then
+           If BoardType = "DT" Then
                 MainForm.ConnectorTypeDisplay = "Large GDS NO STC"
                 Vout2STC = False
                 MainForm.STCOUTPUTLabel.Visible = False
@@ -574,13 +550,9 @@ Dim MyValue As String
             End If
         End If
     
-                
-        BoardType = (Mid$(MainForm.FirstMCSBarcode, 15, 2))
-        
-        If (Mid$(MainForm.FirstMCSBarcode, 20, 1)) = "M" Or (Mid$(MainForm.FirstMCSBarcode, 20, 1)) = "H" Then
+        If MCSMatingConnector = "M" Or MCSMatingConnector = "H" Then
             MsgBox " PLEASE STAMP FIT MATING CONNECTOR ON FRONT OF WORKS ORDER"
         End If
-        
         
         i = 1
         
@@ -664,15 +636,14 @@ Dim MyValue As String
             End If
         End If
 
-        If (Mid$(MainForm.FirstMCSBarcode, 22, 2)) = "SM" Then
+        If MCSProductRange = "SM" Then
              MsgBox "SMPE Paint Caps Required"
         End If
 
-        If (Mid$(MainForm.FirstMCSBarcode, 18, 2)) = "AN" Then
+        If ConnectorType = "AN" Then
              MsgBox "M12 Paint Caps Required"
         End If
 
-        LoadValue = (Mid$(MainForm.FirstMCSBarcode, 25, 3))
         If LoadValue = "000" Then
         
             If CheckLoadOn = True Then
@@ -689,8 +660,8 @@ Dim MyValue As String
             MainForm.LoadValueDisplay = LoadValue
             MsgBox "PLACE RESISTOR " & LoadValue & LoadType
         End If
-        If (Mid$(MainForm.ThirdMCSBarcode, 1, 3) = "%2T") Or (Mid$(MainForm.ThirdMCSBarcode, 1, 3) = "%2S") Then
-            Vout2 = True
+        
+        If Vout2 Then
             MainForm.VOUT2OUTPUTLABEL.Visible = True
             MainForm.VOUT2OutputDisplay.Visible = True
             MainForm.VOUT2TargetDisplay.Visible = True
@@ -702,7 +673,6 @@ Dim MyValue As String
             MainForm.VOUT2ERRORLIMITLABEL.Visible = True
             
         Else
-            Vout2 = False
             MainForm.VOUT2OUTPUTLABEL.Visible = False
             MainForm.VOUT2OutputDisplay.Visible = False
             MainForm.VOUT2OUTPUTERRORDISPLAY.Visible = False
@@ -752,27 +722,9 @@ Private Sub FINDLIMITS()
     Dim Vout1Reading As Double
     Dim Difference As Double
 
-     OutputType = (Mid$(MainForm.SecondMCSBarcode, 3, 1))
+    ParseSecondBarcode MainForm.SecondMCSBarcode
+    ParseThirdBarcode MainForm.ThirdMCSBarcode
     
-     BarcodeUnits = (Mid$(MainForm.SecondMCSBarcode, 12, 1))
-     BarcodeOffset = (Mid$(MainForm.SecondMCSBarcode, 4, 3))
-     If (Mid$(MainForm.SecondMCSBarcode, 8, 1)) = "A" Then
-     BarcodeFullScale = 1025
-     Else
-     BarcodeFullScale = (Mid$(MainForm.SecondMCSBarcode, 8, 3))
-     End If
-     
-     If BarcodeUnits = "B" Then
-     BarcodeZeroPressure = (Mid$(MainForm.SecondMCSBarcode, 13, 2))
-     BarcodeFSPressure = (Mid$(MainForm.SecondMCSBarcode, 17, 4))
-     Units = "bar"
-     Else
-     BarcodeZeroPressure = (Mid$(MainForm.SecondMCSBarcode, 12, 3))
-     BarcodeFSPressure = (Mid$(MainForm.SecondMCSBarcode, 16, 5))
-     Units = "psi"
-     End If
-    
-     ZeroPressureSign = (Mid$(MainForm.SecondMCSBarcode, 11, 1))
      
      If OutputType = "A" Then
          Offset = BarcodeOffset / 10
@@ -835,11 +787,11 @@ Private Sub FINDLIMITS()
        
     Else
     
-        If Mid$(MainForm.FirstMCSBarcode, 22, 2) = "P2" Then
+        If MCSProductRange = "P2" Then
             Offset = 5.656
             MainForm.OffsetTargetDisplay = Offset
             OutputSpan = 16
-        ElseIf Mid$(MainForm.FirstMCSBarcode, 22, 2) = "TG" Then 'added GC for Terex Genie
+        ElseIf MCSProductRange = "TG" Then 'added GC for Terex Genie
             Offset = 0.185
             MainForm.OffsetTargetDisplay = Offset
             OutputSpan = 6
@@ -847,9 +799,9 @@ Private Sub FINDLIMITS()
     
     
     
-        If Mid$(MainForm.FirstMCSBarcode, 22, 2) = "A1" Then
+        If MCSProductRange = "A1" Then
             MainForm.LimitPercentDisplay = 0.2
-        ElseIf Mid$(MainForm.FirstMCSBarcode, 22, 2) = "X2" Then
+        ElseIf MCSProductRange = "X2" Then
             MainForm.LimitPercentDisplay = 0.15
         Else
             MainForm.LimitPercentDisplay = 0.5
@@ -869,10 +821,7 @@ Private Sub FINDLIMITS()
         
     End If
 
-    If (Mid$(MainForm.ThirdMCSBarcode, 3, 1) = "T") Then
-    
-        Fullscale2 = Mid$(MainForm.ThirdMCSBarcode, 8, 3)
-        Offset2 = Mid$(MainForm.ThirdMCSBarcode, 4, 3)
+    If Vout2Mode = "T" Then
     
         If OutputType = "A" Then
              Offset2 = Offset2 / 10
@@ -903,8 +852,6 @@ Private Sub FINDLIMITS()
             MainForm.FAILED.Visible = True
             MsgBox "Temperature Measurment Error - ABORT"
         Else
-            VOUT2Spana = Mid$(MainForm.ThirdMCSBarcode, 11, 4)
-            VOUT2SpanB = Mid$(MainForm.ThirdMCSBarcode, 17, 4)
             VOUT2Span = VOUT2SpanB - VOUT2Spana
             Vout2Target = (Span2 / VOUT2Span * (CurrentTemp - VOUT2Spana)) + Offset2
             MainForm.VOUT2TargetDisplay = Format$(Vout2Target, "0.0000")
@@ -913,33 +860,29 @@ Private Sub FINDLIMITS()
         End If
     End If
     
-    If (Mid$(MainForm.ThirdMCSBarcode, 3, 1) = "S") Then
+    If Vout2Mode = "S" Then
         MainForm.VOUT2LimitDisplay.Visible = False
         MainForm.VOUT2ERRORLIMITLABEL.Visible = False
         
 'check switch high or low
 
-        If (Mid$(MainForm.ThirdMCSBarcode, 4, 1) = "0") Then
+        If Left$(ThirdBarcodeFormatCheck, 1) = "0" Then
             MainForm.VOUT2TargetDisplay = "<0.2v"
         Else
             MainForm.VOUT2TargetDisplay = ">4v"
         End If
     End If
 
-        If (Mid$(MainForm.FirstMCSBarcode, 13, 1) = "0") Then
-            MainForm.RestrictorDisplay = "No"
-            RestrictorRequired = False
-        Else
-            MainForm.RestrictorDisplay = "Yes"
-            RestrictorRequired = True
-        End If
-        If (Mid$(MainForm.FirstMCSBarcode, 29, 2) = "--") Then
-            MainForm.ORingDisplay = "No"
-            ORingRequired = False
-        Else
-            MainForm.ORingDisplay = "Yes"
-            ORingRequired = True
-        End If
+    If RestrictorReq Then
+        MainForm.RestrictorDisplay = "Yes"
+    Else
+        MainForm.RestrictorDisplay = "No"
+    End If
+    If ORingRequired Then
+        MainForm.ORingDisplay = "Yes"
+    Else
+        MainForm.ORingDisplay = "No"
+    End If
       
 End Sub
 Public Sub START()
@@ -1263,7 +1206,7 @@ Dim Vout2Reading As Double
         Vout2Reading = MeasureDigitalMultimeterVolts
         MainForm.VOUT2OutputDisplay = Format$(Vout2Reading, "0.0000")
             
-        If (Mid$(MainForm.ThirdMCSBarcode, 4, 1) = "0") Then
+        If (Left$(ThirdBarcodeFormatCheck, 1) = "0") Then
             If Vout2Reading < 1 Then
                 MainForm.VOUT2PASS.Visible = True
                 MainForm.VOUT2FAIL.Visible = False
@@ -1319,9 +1262,9 @@ Dim Vout2Reading As Double
         RouteDMM "Current"
 
         If BarcodeUnits = "B" Then
-            FSPressure = (Mid$(MainForm.SecondMCSBarcode, 17, 4))
+            FSPressure = BarcodeFSPressure
         Else
-            FSPressure = (Mid$(MainForm.SecondMCSBarcode, 16, 5) / 14.5)
+            FSPressure = BarcodeFSPressure / 14.5
         End If
         
 
@@ -1363,9 +1306,9 @@ Dim Vout2Reading As Double
         RouteDMM "Vout1"
        
         If BarcodeUnits = "B" Then
-            FSPressure = (Mid$(MainForm.SecondMCSBarcode, 17, 4))
+            FSPressure = BarcodeFSPressure
         Else
-            FSPressure = (Mid$(MainForm.SecondMCSBarcode, 16, 5) / 14.5)
+            FSPressure = BarcodeFSPressure / 14.5
         End If
              
         SetPSU2 Vsupply
@@ -1404,7 +1347,7 @@ Dim Vout2Reading As Double
 Dim SwitchPSUValue As Double
    
 'if temp output
-    If (Mid$(MainForm.ThirdMCSBarcode, 3, 1) = "T") Then
+    If Vout2Mode = "T" Then
 
         SetPSU2 Vsupply
 'switch to vout 2
@@ -1429,7 +1372,7 @@ Dim SwitchPSUValue As Double
     End If
     
 'if Switch output
-    If (Mid$(MainForm.ThirdMCSBarcode, 3, 1) = "S") And BoardType <> "HY" Then
+    If Vout2Mode = "S" And BoardType <> "HY" Then
 
         SetPSU2 Vsupply
         
@@ -1440,7 +1383,7 @@ Dim SwitchPSUValue As Double
             Vout2Reading = MeasureDigitalMultimeterVolts
             MainForm.VOUT2OutputDisplay = Format$(Vout2Reading, "0.0000")
         
-            If (Mid$(MainForm.ThirdMCSBarcode, 4, 1) = "0") Then
+            If (Left$(ThirdBarcodeFormatCheck, 1) = "0") Then
                 If Vout2Reading < 0.2 Then
                     MainForm.VOUT2PASS.Visible = True
                     MainForm.VOUT2FAIL.Visible = False
@@ -1477,7 +1420,7 @@ Dim SwitchPSUValue As Double
             Vout2Reading = MeasureDigitalMultimeterVolts
             MainForm.VOUT2OutputDisplay = Format$(Vout2Reading, "0.0000")
         
-            If (Mid$(MainForm.ThirdMCSBarcode, 4, 1) = "0") Then
+            If (Left$(ThirdBarcodeFormatCheck, 1) = "0") Then
                 If Vout2Reading < 0.2 Then
                     MainForm.VOUT2PASS.Visible = True
                     MainForm.VOUT2FAIL.Visible = False
@@ -1508,7 +1451,7 @@ Dim SwitchPSUValue As Double
             Vout2Reading = MeasureDigitalMultimeterVolts
             MainForm.VOUT2OUTPUTERRORDISPLAY = Format$(Vout2Reading, "0.0000")
         
-            If (Mid$(MainForm.ThirdMCSBarcode, 4, 1) = "0") Then
+            If (Left$(ThirdBarcodeFormatCheck, 1) = "0") Then
                 'If Vout2Reading > Vsupply - 1 Then
                 If Vout2Reading > 4 Then
                     MainForm.VOUT2SWPASS.Visible = True
@@ -1642,7 +1585,7 @@ DoEvents
         Vout2Reading = MeasureDigitalMultimeterVolts
         MainForm.VOUT2OutputDisplay = Format$(Vout2Reading, "0.0000")
     
-        If (Mid$(MainForm.ThirdMCSBarcode, 4, 7) = "000/100") Then
+        If (ThirdBarcodeFormatCheck = "000/100") Then
             If Vout2Reading < 0.2 Then
                 MainForm.VOUT2PASS.Visible = True
                 MainForm.VOUT2FAIL.Visible = False
@@ -2144,12 +2087,7 @@ Dim SplitValues() As String
      
 End Function
 Private Sub CalculateSwitchTarget()
-
-    If BarcodeUnits = "B" Then
-        SWPressure = (Mid$(MainForm.ThirdMCSBarcode, 17, 4))
-    Else
-        SWPressure = (Mid$(MainForm.ThirdMCSBarcode, 16, 5) / 14.5)
-    End If
+    ' SWPressure is already parsed by ParseThirdBarcode
 
     PSUSwitchTarget = (SWPressure / FSPressure * OutputSpan) + Offset
  '   SWError = OutputSpan / 100 * 0.9
@@ -2379,7 +2317,7 @@ End Sub
 Public Sub TestOringAndRest()
 
     ORingRequired = False
-    RestrictorRequired = False
+    RestrictorReq = False
     ChangeVisionProgram 35
     RecieveVision
     
@@ -2387,7 +2325,7 @@ End Sub
 Public Sub TestOringAndRest2()
 
     ORingRequired = True
-    RestrictorRequired = True
+    RestrictorReq = True
     ChangeVisionProgram 35
     RecieveVision
 
